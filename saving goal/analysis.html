@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Deposit Tracker - Analysis & Visual Reports (Static Edition)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+  <!-- Chart.js for interactive client-side charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      "darkMode": "class",
+      "theme": {
+        "extend": {
+          "colors": {
+            "surface-container-high": "#dee8ff",
+            "surface-variant": "#d8e3fb",
+            "on-surface": "#111c2d",
+            "surface-container-lowest": "#ffffff",
+            "primary-container": "#10b981",
+            "primary": "#006c49",
+            "surface-container": "#e7eeff",
+            "surface-container-low": "#f0f3ff",
+            "surface": "#f9f9ff",
+            "outline": "#6c7a71",
+            "secondary": "#b61722",
+            "tertiary": "#006591",
+            "error-container": "#ffdad6"
+          },
+          "fontFamily": {
+            "sans": ["Inter", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface font-sans text-on-surface antialiased min-h-screen flex flex-col justify-between">
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-40 w-full bg-surface-container-lowest/90 backdrop-blur-md border-b border-surface-container shadow-sm">
+    <div class="h-16 max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-6">
+      <div class="flex items-center gap-6 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-primary-container/20 flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[22px]">savings</span>
+          </div>
+          <span class="text-xl font-bold text-on-surface tracking-tight">Deposit Tracker</span>
+          <span class="px-2.5 py-0.5 rounded-full text-xs bg-surface-container-high text-on-surface-variant font-medium">Static Web App</span>
+        </div>
+        <nav class="hidden md:flex items-center gap-2">
+          <a class="px-3.5 py-1.5 rounded-xl text-sm font-medium text-outline hover:text-on-surface hover:bg-surface-container-low transition-all" href="index.html">Dashboard</a>
+          <a class="px-3.5 py-1.5 rounded-xl transition-all bg-surface-container text-on-surface font-medium text-sm" href="analysis.html">Deposit Analysis</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-3">
+        <a class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary-container text-white font-medium text-sm hover:bg-primary transition-all shadow-sm" href="index.html">
+          <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+          <span>Back to Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="w-full flex-1 bg-surface">
+    <div class="w-full max-w-7xl mx-auto px-6 lg:px-12 py-8 space-y-8">
+      
+      <!-- Navigation Header -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
+        <div class="space-y-2">
+          <a class="inline-flex items-center gap-2 text-outline hover:text-primary transition-colors text-sm font-medium group" href="index.html">
+            <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
+            <span>Back to Home Dashboard</span>
+          </a>
+          <div>
+            <div class="flex items-center gap-3">
+              <h1 class="text-2xl font-bold text-on-surface tracking-tight">Deposit Analysis & Visual Reports</h1>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs bg-primary/10 text-primary font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+                Interactive Telemetry
+              </span>
+            </div>
+            <p class="text-sm text-outline mt-1">In-depth breakdown of your daily contributions and cumulative capital growth trajectory.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Metrics Summary 5-Column Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <!-- Metric 1: Goal Deposits -->
+        <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-outline uppercase tracking-wider">Goal Deposits</span>
+            <div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[18px]">flag</span>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="text-xl font-bold text-on-surface tracking-tight" id="anaGoalDisplay">$0.00</div>
+            <div class="text-xs text-outline mt-1">Target Saving Goal</div>
+          </div>
+        </div>
+
+        <!-- Metric 2: Total Deposits -->
+        <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-outline uppercase tracking-wider">Total Deposits</span>
+            <div class="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="text-xl font-bold text-on-surface tracking-tight" id="anaTotalDisplay">$0.00</div>
+            <div class="text-xs text-primary font-medium mt-1">Cumulative Total</div>
+          </div>
+        </div>
+
+        <!-- Metric 3: Remain Deposits -->
+        <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-secondary" id="anaRemainTitle">Remain Deposits</span>
+            <div class="w-8 h-8 rounded-xl bg-error-container/60 flex items-center justify-center text-secondary" id="anaRemainIcon">
+              <span class="material-symbols-outlined text-[18px]">hourglass_top</span>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="text-xl font-bold tracking-tight text-secondary" id="anaRemainDisplay">$0.00</div>
+            <div class="text-xs text-outline mt-1" id="anaRemainSub">Needed to reach goal</div>
+          </div>
+        </div>
+
+        <!-- Metric 4: Average Deposits -->
+        <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-outline uppercase tracking-wider">Average Deposits</span>
+            <div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-outline">
+              <span class="material-symbols-outlined text-[18px]">analytics</span>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="text-xl font-bold text-on-surface tracking-tight" id="anaAvgDisplay">$0.00</div>
+            <div class="text-xs text-outline mt-1">Per contribution</div>
+          </div>
+        </div>
+
+        <!-- Metric 5: Completeness -->
+        <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-outline uppercase tracking-wider">Completeness</span>
+            <div class="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[18px]">done_all</span>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-baseline gap-2">
+              <div class="text-xl font-bold text-on-surface tracking-tight" id="anaCompText">0%</div>
+              <span class="text-xs text-primary font-bold" id="anaCompBadge">Pacing</span>
+            </div>
+            <div class="w-full bg-surface-container rounded-full h-1.5 mt-2.5 overflow-hidden">
+              <div id="anaCompBar" class="bg-primary-container h-full rounded-full" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Large Interactive Chart Cards (2 Columns) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Chart Card 1: Daily Deposit Bar Chart -->
+        <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-surface-container flex flex-col justify-between">
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex items-center gap-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-primary-container"></div>
+                <h2 class="text-lg font-bold text-on-surface">Daily Deposit Chart</h2>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg text-xs bg-surface-container text-on-surface-variant font-medium">Daily Breakdown</span>
+            </div>
+            <p class="text-xs text-outline">Interactive bar chart showing deposits by transaction date</p>
+          </div>
+          <div class="w-full h-80 p-2 flex items-center justify-center">
+            <canvas id="chartDailyBar"></canvas>
+          </div>
+          <div class="flex items-center justify-between pt-4 mt-2 text-outline text-xs border-t border-surface-container">
+            <span class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-primary-container"></span>
+              <span id="anaBarCount">0</span> entries logged
+            </span>
+            <span class="font-semibold text-on-surface" id="anaBarTotal">Total: $0.00</span>
+          </div>
+        </div>
+
+        <!-- Chart Card 2: Deposit Accumulation Line Chart -->
+        <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-surface-container flex flex-col justify-between">
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex items-center gap-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-tertiary"></div>
+                <h2 class="text-lg font-bold text-on-surface">Deposit Accumulation Chart</h2>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-0.5 bg-secondary inline-block"></span>
+                <span class="text-xs text-secondary font-semibold" id="anaTargetTag">Target Goal</span>
+              </div>
+            </div>
+            <p class="text-xs text-outline">Cumulative savings trajectory versus target milestone threshold</p>
+          </div>
+          <div class="w-full h-80 p-2 flex items-center justify-center">
+            <canvas id="chartAccumulationLine"></canvas>
+          </div>
+          <div class="flex items-center justify-between pt-4 mt-2 text-outline text-xs border-t border-surface-container">
+            <span class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+              Trend Line & Target Line
+            </span>
+            <span class="font-semibold text-primary" id="anaCompRate">0% Achieved</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-4 flex justify-start">
+        <a href="index.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-surface-container-low hover:bg-surface-container text-on-surface font-medium text-sm rounded-xl transition-colors">
+          <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+          <span>Back to Dashboard</span>
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="w-full bg-surface-container-lowest border-t border-surface-container py-6 mt-8">
+    <div class="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <span class="text-xs text-outline">© 2025 Deposit Tracker. Static Edition for GitHub Pages.</span>
+      <div class="flex items-center gap-6">
+        <a class="text-xs text-outline hover:text-primary transition-colors" href="index.html">Dashboard</a>
+        <a class="text-xs text-outline hover:text-primary transition-colors" href="analysis.html">Analysis</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Client-Side Analysis Script -->
+  <script>
+    const STORAGE_KEY_TARGET = 'deposit_tracker_target';
+    const STORAGE_KEY_DEPOSITS = 'deposit_tracker_deposits';
+
+    function getTargetAmount() {
+      return parseFloat(localStorage.getItem(STORAGE_KEY_TARGET)) || 0;
+    }
+
+    function getDeposits() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_DEPOSITS);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function formatMoney(num) {
+      return '$' + Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Render Stats and Charts
+    const target = getTargetAmount();
+    const deposits = getDeposits();
+
+    // Sort by date ascending
+    deposits.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // Aggregate by date for daily chart
+    const dailyMap = {};
+    let runningTotal = 0;
+    const datesArr = [];
+    const dailyAmountsArr = [];
+    const cumulativeArr = [];
+
+    deposits.forEach(d => {
+      const date = d.date;
+      const amt = Number(d.amount);
+      runningTotal += amt;
+      if (!dailyMap[date]) {
+        dailyMap[date] = 0;
+      }
+      dailyMap[date] += amt;
+    });
+
+    for (const [date, amt] of Object.entries(dailyMap)) {
+      datesArr.push(date);
+      dailyAmountsArr.push(amt);
+    }
+
+    // Calculate cumulative for each unique date
+    let cumulativeAcc = 0;
+    datesArr.forEach(date => {
+      cumulativeAcc += dailyMap[date];
+      cumulativeArr.push(cumulativeAcc);
+    });
+
+    const total = runningTotal;
+    const remain = target - total;
+    const avg = deposits.length > 0 ? (total / deposits.length) : 0;
+    const completeness = target > 0 ? Math.min(100, Math.round((total / target) * 10000) / 100) : 0;
+
+    // Fill Summary Badges
+    document.getElementById('anaGoalDisplay').textContent = formatMoney(target);
+    document.getElementById('anaTotalDisplay').textContent = formatMoney(total);
+
+    const anaRemainDisplay = document.getElementById('anaRemainDisplay');
+    const anaRemainTitle = document.getElementById('anaRemainTitle');
+    const anaRemainIcon = document.getElementById('anaRemainIcon');
+    const anaRemainSub = document.getElementById('anaRemainSub');
+
+    anaRemainDisplay.textContent = formatMoney(Math.abs(remain));
+    if (remain <= 0 && target > 0) {
+      anaRemainTitle.className = 'text-xs font-semibold uppercase tracking-wider text-primary';
+      anaRemainIcon.className = 'w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-primary';
+      anaRemainDisplay.className = 'text-xl font-bold tracking-tight text-primary';
+      anaRemainSub.textContent = 'Target Achieved!';
+    } else {
+      anaRemainTitle.className = 'text-xs font-semibold uppercase tracking-wider text-secondary';
+      anaRemainIcon.className = 'w-8 h-8 rounded-xl bg-error-container/60 flex items-center justify-center text-secondary';
+      anaRemainDisplay.className = 'text-xl font-bold tracking-tight text-secondary';
+      anaRemainSub.textContent = 'Needed to reach goal';
+    }
+
+    document.getElementById('anaAvgDisplay').textContent = formatMoney(avg);
+    document.getElementById('anaCompText').textContent = completeness + '%';
+    document.getElementById('anaCompBar').style.width = completeness + '%';
+    document.getElementById('anaCompRate').textContent = completeness + '% Achieved';
+    document.getElementById('anaTargetTag').textContent = `Target: ${formatMoney(target)}`;
+    document.getElementById('anaBarCount').textContent = deposits.length;
+    document.getElementById('anaBarTotal').textContent = `Total: ${formatMoney(total)}`;
+
+    const anaCompBadge = document.getElementById('anaCompBadge');
+    if (completeness >= 100) {
+      anaCompBadge.textContent = 'Complete';
+      anaCompBadge.className = 'text-xs text-primary font-bold';
+    } else {
+      anaCompBadge.textContent = 'In Progress';
+      anaCompBadge.className = 'text-xs text-primary font-bold';
+    }
+
+    // Chart 1: Daily Bar Chart
+    const ctxBar = document.getElementById('chartDailyBar').getContext('2d');
+    new Chart(ctxBar, {
+      type: 'bar',
+      data: {
+        labels: datesArr.length > 0 ? datesArr : ['No Data'],
+        datasets: [{
+          label: 'Daily Deposit',
+          data: dailyAmountsArr.length > 0 ? dailyAmountsArr : [0],
+          backgroundColor: '#10b981',
+          borderRadius: 6,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return 'Amount: ' + formatMoney(context.parsed.y);
+              }
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false } },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) { return '$' + value; }
+            }
+          }
+        }
+      }
+    });
+
+    // Chart 2: Cumulative Line Chart with Target Line
+    const ctxLine = document.getElementById('chartAccumulationLine').getContext('2d');
+    const targetLineData = datesArr.map(() => target);
+
+    new Chart(ctxLine, {
+      type: 'line',
+      data: {
+        labels: datesArr.length > 0 ? datesArr : ['No Data'],
+        datasets: [
+          {
+            label: 'Cumulative Savings',
+            data: cumulativeArr.length > 0 ? cumulativeArr : [0],
+            borderColor: '#006c49',
+            backgroundColor: 'rgba(16, 185, 129, 0.15)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.3,
+            pointBackgroundColor: '#10b981',
+            pointRadius: 5
+          },
+          {
+            label: 'Target Goal',
+            data: targetLineData.length > 0 ? targetLineData : [target],
+            borderColor: '#b61722',
+            borderWidth: 2,
+            borderDash: [6, 6],
+            pointRadius: 0,
+            fill: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            labels: { boxWidth: 12 }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.dataset.label + ': ' + formatMoney(context.parsed.y);
+              }
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false } },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) { return '$' + value; }
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

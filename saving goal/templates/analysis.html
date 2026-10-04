@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Deposit Tracker - Analysis & Visual Reports</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      "darkMode": "class",
+      "theme": {
+        "extend": {
+          "colors": {
+            "surface-container-high": "#dee8ff",
+            "surface-variant": "#d8e3fb",
+            "on-surface": "#111c2d",
+            "surface-container-highest": "#d8e3fb",
+            "on-tertiary-fixed-variant": "#004c6e",
+            "surface-container-lowest": "#ffffff",
+            "on-error": "#ffffff",
+            "outline": "#6c7a71",
+            "error": "#ba1a1a",
+            "on-tertiary-container": "#003d59",
+            "on-primary-fixed": "#002113",
+            "primary-container": "#10b981",
+            "tertiary-fixed-dim": "#89ceff",
+            "secondary-fixed": "#ffdad7",
+            "tertiary-container": "#23acf1",
+            "on-primary-container": "#00422b",
+            "surface-dim": "#cfdaf2",
+            "primary-fixed-dim": "#4edea3",
+            "surface-tint": "#006c49",
+            "surface-bright": "#f9f9ff",
+            "inverse-surface": "#263143",
+            "on-tertiary-fixed": "#001e2f",
+            "on-background": "#111c2d",
+            "primary-fixed": "#6ffbbe",
+            "secondary-fixed-dim": "#ffb3ad",
+            "error-container": "#ffdad6",
+            "on-primary-fixed-variant": "#005236",
+            "on-error-container": "#93000a",
+            "on-secondary-fixed": "#410004",
+            "on-tertiary": "#ffffff",
+            "background": "#f9f9ff",
+            "on-primary": "#ffffff",
+            "inverse-on-surface": "#ecf1ff",
+            "primary": "#006c49",
+            "surface-container": "#e7eeff",
+            "on-secondary-fixed-variant": "#930013",
+            "tertiary": "#006591",
+            "on-secondary": "#ffffff",
+            "on-surface-variant": "#3c4a42",
+            "outline-variant": "#bbcabf",
+            "surface-container-low": "#f0f3ff",
+            "tertiary-fixed": "#c9e6ff",
+            "on-secondary-container": "#fffbff",
+            "secondary": "#b61722",
+            "surface": "#f9f9ff",
+            "secondary-container": "#da3437",
+            "inverse-primary": "#4edea3"
+          },
+          "fontFamily": {
+            "headline-xl": ["Inter"],
+            "headline-md": ["Inter"],
+            "stat-value": ["Inter"],
+            "body-lg": ["Inter"],
+            "body-md": ["Inter"],
+            "body-sm": ["Inter"],
+            "label-md": ["Inter"],
+            "label-sm": ["Inter"],
+            "tabular-mono": ["Inter"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between">
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-50 w-full bg-surface-container-lowest/90 backdrop-blur-md border-b border-surface-container shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+    <div class="h-16 max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-6">
+      <div class="flex items-center gap-6 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-primary-container/20 flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[22px]">savings</span>
+          </div>
+          <span class="text-xl font-bold text-on-surface tracking-tight">Deposit Tracker</span>
+          <span class="px-2.5 py-0.5 rounded-full text-xs bg-surface-container-high text-on-surface-variant font-medium">Personal Finance</span>
+        </div>
+        <nav class="hidden md:flex items-center gap-2">
+          <a class="px-3.5 py-1.5 rounded-xl text-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-all" href="{{ url_for('home') }}">Dashboard</a>
+          <a class="px-3.5 py-1.5 rounded-xl transition-all bg-surface-container text-on-surface font-medium text-sm" href="{{ url_for('analysis') }}">Deposit Analysis</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-3">
+        <a class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary-container text-on-primary font-medium text-sm hover:bg-primary transition-all shadow-sm" href="{{ url_for('home') }}">
+          <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+          <span>Back to Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="w-full flex-1 bg-surface">
+    <div class="w-full max-w-7xl mx-auto px-6 lg:px-12 py-8 space-y-8">
+      
+      <!-- Navigation Header -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
+        <div class="space-y-2">
+          <a class="inline-flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-sm font-medium group" href="{{ url_for('home') }}">
+            <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-x-1">arrow_back</span>
+            <span>Back to Home Dashboard</span>
+          </a>
+          <div>
+            <div class="flex items-center gap-3">
+              <h1 class="text-2xl font-bold text-on-surface tracking-tight">Deposit Analysis & Visual Reports</h1>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs bg-primary/10 text-primary font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+                Live Telemetry
+              </span>
+            </div>
+            <p class="text-sm text-on-surface-variant mt-1">In-depth breakdown of your daily contributions and cumulative capital growth trajectory.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Metrics Summary 5-Column Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <!-- Metric 1: Goal Deposits -->
+        <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Goal Deposits</span>
+            <div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[18px]">flag</span>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="text-xl font-bold text-on-surface tracking-tight">${{ "{:,.2f}".format(user_targetamount|float) }}</div>
+            <div class="text-xs text-on-surface-variant mt-1">Target Saving Goal</div>
+          </div>
+        </div>
+
+        <!-- Metric 2: Total Deposits -->
+        <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Total Deposits</span>
+            <div class="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="text-xl font-bold text-on-surface tracking-tight">${{ "{:,.2f}".format(calculations[0]|float) }}</div>
+            <div class="text-xs text-primary font-medium mt-1">Cumulative Total</div>
+          </div>
+        </div>
+
+        <!-- Metric 3: Remain Deposits -->
+        <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            {% if calculations[1] > 0 %}
+            <span class="text-xs font-semibold uppercase tracking-wider text-secondary">Remain Deposits</span>
+            <div class="w-8 h-8 rounded-xl bg-error-container/60 flex items-center justify-center text-secondary">
+              <span class="material-symbols-outlined text-[18px]">hourglass_top</span>
+            </div>
+            {% else %}
+            <span class="text-xs font-semibold uppercase tracking-wider text-primary">Remain Deposits</span>
+            <div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[18px]">hourglass_top</span>
+            </div>
+            {% endif %}
+          </div>
+          <div class="mt-4">
+            {% if calculations[1] > 0 %}
+            <div class="text-xl font-bold tracking-tight text-secondary">
+              ${{ "{:,.2f}".format(calculations[1]|abs|float) }}
+            </div>
+            <div class="text-xs text-on-surface-variant mt-1">Deficit left</div>
+            {% else %}
+            <div class="text-xl font-bold tracking-tight text-primary">
+              ${{ "{:,.2f}".format(calculations[1]|abs|float) }}
+            </div>
+            <div class="text-xs text-on-surface-variant mt-1">Target achieved!</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Metric 4: Average Deposits -->
+        <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Average Deposits</span>
+            <div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-on-surface-variant">
+              <span class="material-symbols-outlined text-[18px]">analytics</span>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="text-xl font-bold text-on-surface tracking-tight">${{ "{:,.2f}".format(calculations[2]|float) }}</div>
+            <div class="text-xs text-on-surface-variant mt-1">Per contribution</div>
+          </div>
+        </div>
+
+        <!-- Metric 5: Completeness -->
+        <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Completeness</span>
+            <div class="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined text-[18px]">done_all</span>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-baseline gap-2">
+              <div class="text-xl font-bold text-on-surface tracking-tight">{{ calculations[3] }}%</div>
+              <span class="text-xs text-primary font-bold">{% if calculations[3] >= 100 %}Complete{% else %}Pacing{% endif %}</span>
+            </div>
+            <div class="w-full bg-surface-container rounded-full h-1.5 mt-2.5 overflow-hidden">
+              <div id="analysisCompletenessBar" class="bg-primary-container h-full rounded-full"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Large Visual Chart Cards (2 Columns) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Chart Card 1: Daily Deposit Bar Chart -->
+        <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-surface-container flex flex-col justify-between">
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex items-center gap-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-primary-container"></div>
+                <h2 class="text-lg font-bold text-on-surface">Daily Deposit Chart</h2>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg text-xs bg-surface-container text-on-surface-variant font-medium">Daily Breakdown</span>
+            </div>
+            <p class="text-xs text-on-surface-variant">Recent deposit amounts categorized by transaction post date</p>
+          </div>
+          <div class="w-full flex items-center justify-center bg-surface-container-low/30 rounded-xl p-4 border border-surface-container min-h-[300px]">
+            <img class="max-w-full h-auto object-contain rounded-lg" src="data:image/png;base64,{{ daily_chart_img_data }}" alt="Daily Deposit Chart"/>
+          </div>
+          <div class="flex items-center justify-between pt-4 mt-2 text-on-surface-variant text-xs">
+            <span class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-primary-container"></span>
+              {{ calculations[6]|length }} Entries in ledger
+            </span>
+            <span class="font-semibold text-on-surface">Total: ${{ "{:,.2f}".format(calculations[0]|float) }}</span>
+          </div>
+        </div>
+
+        <!-- Chart Card 2: Deposit Accumulation Line Chart -->
+        <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-surface-container flex flex-col justify-between">
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex items-center gap-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-tertiary-container"></div>
+                <h2 class="text-lg font-bold text-on-surface">Deposit Accumulation Chart</h2>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-0.5 bg-secondary inline-block"></span>
+                <span class="text-xs text-secondary font-semibold">Target ${{ "{:,.0f}".format(user_targetamount|float) }}</span>
+              </div>
+            </div>
+            <p class="text-xs text-on-surface-variant">Cumulative savings trajectory versus target milestone threshold</p>
+          </div>
+          <div class="w-full flex items-center justify-center bg-surface-container-low/30 rounded-xl p-4 border border-surface-container min-h-[300px]">
+            <img class="max-w-full h-auto object-contain rounded-lg" src="data:image/png;base64,{{ chart_img_data }}" alt="Deposit Accumulation Chart"/>
+          </div>
+          <div class="flex items-center justify-between pt-4 mt-2 text-on-surface-variant text-xs">
+            <span class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+              Trend Line & Target Line
+            </span>
+            <span class="font-semibold text-primary">{{ calculations[3] }}% Achieved</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-4 flex justify-start">
+        <a href="{{ url_for('home') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-surface-container-low hover:bg-surface-container text-on-surface font-medium text-sm rounded-xl transition-colors">
+          <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+          <span>Back to Dashboard</span>
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="w-full bg-surface-container-lowest border-t border-surface-container py-6 mt-8">
+    <div class="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-on-surface-variant">© 2025 Deposit Tracker. Analysis & Visual Reports.</span>
+      </div>
+      <div class="flex items-center gap-6">
+        <a class="text-xs text-on-surface-variant hover:text-primary transition-colors" href="{{ url_for('home') }}">Dashboard</a>
+        <a class="text-xs text-on-surface-variant hover:text-primary transition-colors" href="{{ url_for('analysis') }}">Analysis</a>
+        <a class="text-xs text-on-surface-variant hover:text-primary transition-colors" href="{{ url_for('add_deposit') }}">Add Deposit</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    const analysisBar = document.getElementById('analysisCompletenessBar');
+    if (analysisBar) {
+      analysisBar.style.width = "{{ calculations[3] }}%";
+    }
+  </script>
+</body>
+</html>
